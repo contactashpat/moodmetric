@@ -73,4 +73,36 @@ describe('POST /v1/users', () => {
       error: 'Invalid role. Must be one of: admin, user, viewer'
     });
   });
+});
+
+describe('GET /v1/users/:id', () => {
+  it('should return a user when valid ID is provided', async () => {
+    const userId = 'user_123456';
+    const response = await request(app)
+      .get(`/v1/users/${userId}`)
+      .expect(200);
+
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toMatchObject({
+      id: userId,
+      email: 'user@example.com',
+      name: 'Mock User',
+      organizationId: 'org_123',
+      role: 'user'
+    });
+    expect(response.body.data.createdAt).toBeDefined();
+    expect(response.body.data.updatedAt).toBeDefined();
+  });
+
+  it('should return 404 when user ID does not exist', async () => {
+    const response = await request(app)
+      .get('/v1/users/nonexistent_user')
+      .expect(404);
+
+    expect(response.body).toEqual({
+      success: false,
+      error: 'User not found',
+      message: 'User with ID nonexistent_user does not exist'
+    });
+  });
 }); 

@@ -77,4 +77,46 @@ router.post('/', (req: Request, res: Response) => {
   }
 });
 
+// GET /users/:id - Get specific user
+router.get('/:id', (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    // TODO: Fetch user from database by ID
+    
+    // For now, return a mock user if ID matches a pattern, otherwise 404
+    if (id.startsWith('user_')) {
+      const mockUser: User = {
+        id,
+        email: 'user@example.com',
+        name: 'Mock User',
+        organizationId: 'org_123',
+        role: 'user',
+        createdAt: new Date('2024-01-01'),
+        updatedAt: new Date()
+      };
+
+      const response: ApiResponse = {
+        success: true,
+        data: mockUser
+      };
+
+      return res.json(response);
+    }
+
+    // User not found
+    res.status(404).json({
+      success: false,
+      error: 'User not found',
+      message: `User with ID ${id} does not exist`
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch user',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    });
+  }
+});
+
 export default router; 
